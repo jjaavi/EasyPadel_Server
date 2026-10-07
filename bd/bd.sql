@@ -7,7 +7,7 @@ CREATE DATABASE IF NOT EXISTS easy_padel;
 USE easy_padel;
 
 -- Es desactiven les foreign keys per poder eliminar les taules
--- en el cas de que es tornin a executar l'escript.
+-- en el cas de que es torni a executar l'escript.
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS reserves;
