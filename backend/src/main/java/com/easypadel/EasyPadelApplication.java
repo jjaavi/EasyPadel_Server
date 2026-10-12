@@ -1,9 +1,11 @@
 package com.easypadel;
 
+import com.easypadel.exception.BackendException;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -25,7 +27,7 @@ public class EasyPadelApplication {
                 }
             } catch (Exception e) {
                 System.err.println("Error de connexio amb la BD: " + e.getMessage());
-                System.out.println("Aplicacio no arrancada.");
+                throw new BackendException(HttpStatus.SERVICE_UNAVAILABLE, "Aplicacio no arrancada.");
             }
         };
     }
