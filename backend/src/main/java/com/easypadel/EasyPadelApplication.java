@@ -14,7 +14,12 @@ import java.sql.Connection;
 public class EasyPadelApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(EasyPadelApplication.class, args);
+        try{
+            SpringApplication.run(EasyPadelApplication.class, args);
+        } catch (Exception e) {
+            System.err.println("Error al arrencar l'aplicació: " + e.getMessage());
+            throw new BackendException(HttpStatus.INTERNAL_SERVER_ERROR, "Aplicació no arrancada.");
+        }
     }
 
     @Bean
