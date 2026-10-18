@@ -26,6 +26,7 @@ public class EasyPadelApplication {
     ApplicationRunner comprovarArrencada(DataSource dataSource) {
         return args -> {
             System.out.println("Aplicacio de part servidor arrencada.");
+
             try (Connection connexio = dataSource.getConnection()) {
                 if (connexio.isValid(2)) {
                     System.out.println("Conexio a Base de dades MySQL de EasyPadel correcta.");
