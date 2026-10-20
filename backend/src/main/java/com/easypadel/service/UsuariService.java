@@ -99,15 +99,16 @@ public class UsuariService {
         Usuari usuari = usuariRepository.findByEmailIgnoreCase(request.email().trim())
                 .orElseThrow(() -> new BackendException(HttpStatus.UNAUTHORIZED, "Credencials incorrectes"));
 
-        if (!usuari.isActiu()) {
-            throw new BackendException(HttpStatus.FORBIDDEN, "L'usuari està desactivat");
-        }
-
+        //De moment es compara la contrasenya en text pla, sense cap mena de seguretat
         if (!usuari.getPassword().equals(request.password())) {
             throw new BackendException(HttpStatus.UNAUTHORIZED, "Credencials incorrectes");
         }
 
-        return LoginResponse.of(UsuariResponse.fromEntity(usuari));
+        if (!usuari.isActiu()) {
+            throw new BackendException(HttpStatus.FORBIDDEN, "L'usuari està desactivat");
+        }
+
+        return LoginResponse.of(usuari);
     }
 
     public void changePassword(Integer id, CanviarPasswordRequest request) {
