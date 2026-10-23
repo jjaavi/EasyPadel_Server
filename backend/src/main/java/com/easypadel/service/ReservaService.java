@@ -10,7 +10,6 @@ import com.easypadel.exception.BackendException;
 import com.easypadel.repository.PistaRepository;
 import com.easypadel.repository.ReservaRepository;
 import com.easypadel.repository.UsuariRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,22 +27,17 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final UsuariRepository usuariRepository;
     private final PistaRepository pistaRepository;
-    private final int diesMaximAntelacio;
 
     public ReservaService(
             ReservaRepository reservaRepository,
             UsuariRepository usuariRepository,
-            PistaRepository pistaRepository,
-            @Value("${app.reserves.dies-maxim-antelacio:10}") int diesMaximAntelacio) {
+            PistaRepository pistaRepository) {
         this.reservaRepository = reservaRepository;
         this.usuariRepository = usuariRepository;
         this.pistaRepository = pistaRepository;
-        this.diesMaximAntelacio = diesMaximAntelacio;
     }
 
     public ReservaResponse create(ReservaRequest request) {
-        validarData(request.data());
-
         //1. Primer es valida que l'usuari existeix
         Usuari usuari = findUsuariById(request.usuariId());
         validarUsuariActiu(usuari);
@@ -67,7 +61,6 @@ public class ReservaService {
     public ReservaResponse update(Integer id, ReservaRequest request) {
         //Es valida que la reserva existeix i es recupera de la base de dades
         Reserva reserva = findById(id);
-        validarData(request.data());
 
         Usuari usuari = findUsuariById(request.usuariId());
         validarUsuariActiu(usuari);
@@ -196,14 +189,6 @@ public class ReservaService {
 
         if (ocupat) {
             throw new BackendException(HttpStatus.CONFLICT, "El torn seleccionat ja està reservat");
-        }
-    }
-
-    private void validarData(LocalDate data) {
-        LocalDate avui = LocalDate.now();
-        if (data.isBefore(avui) || data.isAfter(avui.plusDays(diesMaximAntelacio))) {
-            throw new BackendException(HttpStatus.BAD_REQUEST,
-                    "La data de la reserva ha d'estar entre avui i " + diesMaximAntelacio + " dies d'antelació");
         }
     }
 

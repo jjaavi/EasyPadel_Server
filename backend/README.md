@@ -275,12 +275,12 @@ tenir una reserva per data i torn.
 |------|-------|-----------|
 | `usuariId` | int | Obligatori. L'usuari ha d'existir i estar actiu. |
 | `pistaId` | int | Obligatori. La pista ha d'existir i estar activa. |
-| `data` | date | Obligatori. Entre avui i avui + `app.reserves.dies-maxim-antelacio` dies (10 per defecte). |
+| `data` | date | Obligatori. El rang de dates permes es controla a l'aplicacio d'interficie. |
 | `torn` | int | Obligatori, entre 1 i 7. El torn ha d'estar lliure. |
 
 Errors:
 
-- 400: validacio o data fora de rang.
+- 400: validacio.
 - 403: usuari desactivat o pista desactivada.
 - 404: reserva (`PUT`), usuari o pista no trobats.
 - 409: `El torn seleccionat ja està reservat`. En `PUT` no es te en compte la propia reserva.
