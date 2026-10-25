@@ -83,6 +83,13 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.listReservesAnteriorsPerUsuariId(usuariId, data));
     }
 
+    //GET /api/reserves/properes?data=2026-10-14  (maxim 20 reserves des de data) Consulta per admin.
+    @GetMapping("/properes")
+    public ResponseEntity<List<ReservaResponse>> listProperes20Reserves(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        return ResponseEntity.ok(reservaService.listProperes20Reserves(data));
+    }
+
     //GET /api/reserves/data/2026-10-14
     @GetMapping("/data/{data}")
     public ResponseEntity<List<ReservaResponse>> listReservesByData(
@@ -98,13 +105,15 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.listReservesByPistaAndData(pistaId, data));
     }
 
-    //GET /api/reserves/cercar?data=2026-10-14&pistaId=1&usuariId=1  (tots els parametres son opcionals)
-    @GetMapping("/cercar")
-    public ResponseEntity<List<ReservaResponse>> searchForAdmin(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
+    //GET /api/reserves/cercaAdmin?reservaId=1&usuariId=1&pistaId=1&data=2026-10-14&torn=3  (tots els parametres son opcionals)
+    @GetMapping("/cercaAdmin")
+    public ResponseEntity<List<ReservaResponse>> cercarAdmin(
+            @RequestParam(required = false) Integer reservaId,
+            @RequestParam(required = false) Integer usuariId,
             @RequestParam(required = false) Integer pistaId,
-            @RequestParam(required = false) Integer usuariId) {
-        return ResponseEntity.ok(reservaService.searchForAdmin(data, pistaId, usuariId));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
+            @RequestParam(required = false) Integer torn) {
+        return ResponseEntity.ok(reservaService.searchForAdmin(reservaId, usuariId, pistaId, data, torn));
     }
 
     //GET /api/reserves/disponibilitat/{pistaId}?data=2026-10-14

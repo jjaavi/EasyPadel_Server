@@ -130,6 +130,15 @@ public class ReservaService {
                 .toList();
     }
 
+    //Retorna un maxim de 20 reserves des de la data indicada fins a la mes llunyana
+    @Transactional(readOnly = true)
+    public List<ReservaResponse> listProperes20Reserves(LocalDate data) {
+        return reservaRepository.findTop20ByDataGreaterThanEqualOrderByDataAscTornAscPistaIdAsc(data)
+                .stream()
+                .map(ReservaResponse::fromEntity)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public List<ReservaResponse> listReservesByData(LocalDate data) {
         return reservaRepository.findByDataOrderByPistaIdAscTornAsc(data)
@@ -149,14 +158,20 @@ public class ReservaService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservaResponse> searchForAdmin(LocalDate data, Integer pistaId, Integer usuariId) {
-        if (pistaId != null) {
-            findPistaById(pistaId);
-        }
+    public List<ReservaResponse> searchForAdmin(
+            Integer reservaId, Integer usuariId, Integer pistaId, LocalDate data, Integer torn) {
         if (usuariId != null) {
             findUsuariById(usuariId);
         }
-        return reservaRepository.cercar(data, pistaId, usuariId)
+        if (pistaId != null) {
+            findPistaById(pistaId);
+        }
+        if (torn != null && (torn < Reserva.TORN_MIN || torn > Reserva.TORN_MAX)) {
+            throw new BackendException(HttpStatus.BAD_REQUEST,
+                    "El torn ha d'estar entre " + Reserva.TORN_MIN + " i " + Reserva.TORN_MAX);
+        }
+        Byte tornFiltre = torn == null ? null : torn.byteValue();
+        return reservaRepository.searchForAdmin(reservaId, usuariId, pistaId, data, tornFiltre)
                 .stream()
                 .map(ReservaResponse::fromEntity)
                 .toList();

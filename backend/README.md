@@ -261,8 +261,9 @@ tenir una reserva per data i torn.
 | GET | `/api/reserves/usuari/{usuariId}/posteriors` | Reserves d'un usuari des d'avui | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/usuari/{usuariId}/anteriors?data=` | Reserves d'un usuari anteriors a `data` | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/data/{data}` | Reserves d'un dia | 200 `ReservaResponse[]` |
+| GET | `/api/reserves/properes?data=` | Properes 20 reserves des de `data` | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/pista/{pistaId}?data=` | Reserves d'una pista en un dia | 200 `ReservaResponse[]` |
-| GET | `/api/reserves/cercar?data=&pistaId=&usuariId=` | Cerca per a l'administrador | 200 `ReservaResponse[]` |
+| GET | `/api/reserves/cercaAdmin?reservaId=&usuariId=&pistaId=&data=&torn=` | Cerca per a l'administrador | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/disponibilitat/{pistaId}?data=` | Disponibilitat d'una pista per torns | 200 `DisponibilitatPistaResponse` |
 
 ### Peticio (`POST` i `PUT`)
@@ -293,8 +294,9 @@ Errors:
 | `/usuari/{usuariId}/posteriors` | - | Data asc., torn asc. Inclou avui. | 404 usuari |
 | `/usuari/{usuariId}/anteriors` | `data` (obligatori) | Data desc., torn desc. Exclou `data`. | 400, 404 usuari |
 | `/data/{data}` | - | Pista asc., torn asc. | 400 |
+| `/properes` | `data` (obligatori) | Data asc., torn asc., pista asc. Inclou `data`. Maxim 20. | 400 |
 | `/pista/{pistaId}` | `data` (obligatori) | Torn asc. | 400, 404 pista |
-| `/cercar` | `data`, `pistaId`, `usuariId` (tots opcionals) | - | 400, 404 pista/usuari |
+| `/cercaAdmin` | `reservaId`, `usuariId`, `pistaId`, `data`, `torn` (tots opcionals) | - | 400 (inclou `torn` fora de 1-7), 404 usuari/pista |
 | `/disponibilitat/{pistaId}` | `data` (obligatori) | Torn asc. | 400, 403 pista desactivada, 404 pista |
 
 Exemples:
@@ -302,9 +304,12 @@ Exemples:
 ```
 GET /api/reserves/usuari/1/anteriors?data=2026-10-20
 GET /api/reserves/pista/2?data=2026-10-22
-GET /api/reserves/cercar?data=2026-10-22&usuariId=1
+GET /api/reserves/cercaAdmin?usuariId=1&data=2026-10-22
+GET /api/reserves/cercaAdmin?reservaId=10
 GET /api/reserves/disponibilitat/2?data=2026-10-22
 ```
+
+Els filtres de `/cercaAdmin` es combinen amb AND. Si cap reserva coincideix, retorna una llista buida, tambe si `reservaId` no existeix.
 
 ### `ReservaResponse`
 
