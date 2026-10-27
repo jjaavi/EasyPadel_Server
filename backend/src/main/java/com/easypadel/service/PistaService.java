@@ -83,6 +83,14 @@ public class PistaService {
     }
 
     @Transactional(readOnly = true)
+    public List<PistaResponse> searchForAdmin(Integer pistaId, String nom, Boolean activa) {
+        return pistaRepository.searchForAdmin(pistaId, nom, activa)
+                .stream()
+                .map(PistaResponse::fromEntity)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<PistaResponse> llistarActives() {
         return pistaRepository.findByActivaTrueOrderByIdAsc()
                 .stream()

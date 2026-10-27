@@ -70,6 +70,7 @@ Base: `/api/usuaris`
 | POST | `/api/usuaris/login` | Inici de sessio | 200 `LoginResponse` |
 | POST | `/api/usuaris` | Crear usuari | 201 `UsuariResponse` |
 | GET | `/api/usuaris` | Llistar tots els usuaris | 200 `UsuariResponse[]` |
+| GET | `/api/usuaris/cercaAdmin/` | Cerca amb filtres opcionals | 200 `UsuariResponse[]` |
 | GET | `/api/usuaris/{id}` | Obtenir un usuari | 200 `UsuariResponse` |
 | PUT | `/api/usuaris/{id}` | Modificar un usuari | 200 `UsuariResponse` |
 | PUT | `/api/usuaris/{id}/password` | Canviar la contrasenya | 204 sense cos |
@@ -185,6 +186,19 @@ Errors: 400 (validacio o contrasenya actual incorrecta), 404.
 
 `GET /api/usuaris/{id}` i `DELETE /api/usuaris/{id}` retornen 404 si l'usuari no existeix.
 
+### `GET /api/usuaris/cercaAdmin/`
+
+Filtres opcionals: `usuariId` (int), `nom`, `cognom`, `email`, `telefon` (string),
+`rol` (`ADMIN` o `USER`), `actiu` (boolean) i `dataAlta` (date ISO).
+Es combinen amb AND i les coincidencies son exactes; `nom`, `cognom` i `email`
+no distingeixen majuscules. Sense filtres retorna tots els usuaris, inclosos
+els desactivats, ordenats per id ascendent. Sense coincidencies retorna `[]`,
+tambe si `usuariId` no existeix. No retorna contrasenyes.
+Un id, rol, boolea o data amb format incorrecte retorna 400.
+La ruta tambe accepta peticions sense la barra final.
+
+Exemple: `GET /api/usuaris/cercaAdmin/?rol=USER&actiu=false`
+
 ### `UsuariResponse`
 
 ```json
@@ -212,6 +226,7 @@ Base: `/api/pistes`
 |--------|------|------------|-------------|
 | POST | `/api/pistes` | Crear pista | 201 `PistaResponse` |
 | GET | `/api/pistes` | Llistar totes les pistes | 200 `PistaResponse[]` |
+| GET | `/api/pistes/cercaAdmin/` | Cerca amb filtres opcionals | 200 `PistaResponse[]` |
 | GET | `/api/pistes/actives` | Llistar les pistes actives (ordenades per id) | 200 `PistaResponse[]` |
 | GET | `/api/pistes/{id}` | Obtenir una pista | 200 `PistaResponse` |
 | PUT | `/api/pistes/{id}` | Modificar una pista | 200 `PistaResponse` |
@@ -234,6 +249,17 @@ Errors:
 - `PUT`: 400, 404, 409 (nom d'una altra pista).
 - `DELETE`: 404, 409 (la pista te reserves associades).
 - `GET /{id}`: 404.
+
+### `GET /api/pistes/cercaAdmin/`
+
+Filtres opcionals: `pistaId` (int), `nom` (string) i `activa` (boolean).
+Es combinen amb AND; el nom es compara exactament sense distingir majuscules.
+Sense filtres retorna totes les pistes, incloses les desactivades, ordenades
+per id ascendent. Sense coincidencies retorna `[]`, tambe si `pistaId` no existeix.
+Un id o boolea amb format incorrecte retorna 400.
+La ruta tambe accepta peticions sense la barra final.
+
+Exemple: `GET /api/pistes/cercaAdmin/?activa=false`
 
 ### `PistaResponse`
 

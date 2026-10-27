@@ -7,12 +7,14 @@ import com.easypadel.dto.UsuariCreateRequest;
 import com.easypadel.dto.UsuariResponse;
 import com.easypadel.dto.UsuariUpdateRequest;
 import com.easypadel.entity.Usuari;
+import com.easypadel.entity.Rol;
 import com.easypadel.exception.BackendException;
 import com.easypadel.repository.UsuariRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -88,6 +90,16 @@ public class UsuariService {
     @Transactional(readOnly = true)
     public List<UsuariResponse> listAllUsers() {
         return usuariRepository.findAll()
+                .stream()
+                .map(UsuariResponse::fromEntity)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UsuariResponse> searchForAdmin(
+            Integer usuariId, String nom, String cognom, String email, String telefon,
+            Rol rol, Boolean actiu, LocalDate dataAlta) {
+        return usuariRepository.searchForAdmin(usuariId, nom, cognom, email, telefon, rol, actiu, dataAlta)
                 .stream()
                 .map(UsuariResponse::fromEntity)
                 .toList();
