@@ -81,8 +81,8 @@ public class UsuariController {
                 usuariId, nom, cognom, email, telefon, rol, actiu, dataAlta));
     }
 
-    //PUT /api/usuaris/usuari/{usuariId}/baixa
-    @PutMapping("/usuari/{usuariId}/baixa")
+    //PUT /api/usuaris/{usuariId}/baixa
+    @PutMapping("/{usuariId}/baixa")
     public ResponseEntity<Void> baixaUsuari(@PathVariable Integer usuariId) {
         usuariService.baixa(usuariId);
         return ResponseEntity.noContent().build();
