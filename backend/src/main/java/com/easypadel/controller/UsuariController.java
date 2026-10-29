@@ -47,7 +47,6 @@ public class UsuariController {
                                                  @Valid @RequestBody UsuariUpdateRequest request) {
         return ResponseEntity.ok(usuariService.update(id, request));
     }
-
     //DELETE /api/usuaris/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
@@ -80,6 +79,13 @@ public class UsuariController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataAlta) {
         return ResponseEntity.ok(usuariService.searchForAdmin(
                 usuariId, nom, cognom, email, telefon, rol, actiu, dataAlta));
+    }
+
+    //PUT /api/usuaris/usuari/{usuariId}/baixa
+    @PutMapping("/usuari/{usuariId}/baixa")
+    public ResponseEntity<Void> baixaUsuari(@PathVariable Integer usuariId) {
+        usuariService.baixa(usuariId);
+        return ResponseEntity.noContent().build();
     }
 
     //POST /api/usuaris/login

@@ -71,6 +71,12 @@ public class UsuariService {
         return UsuariResponse.fromEntity(usuariobject);
     }
 
+    public void baixa(Integer id) {
+        Usuari usuari = findById(id);
+        usuari.setActiu(false);
+        usuariRepository.save(usuari);
+    }
+
     public void delete(Integer id) {
         Usuari usuari = findById(id);
         usuariRepository.delete(usuari);

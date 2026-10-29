@@ -74,6 +74,7 @@ Base: `/api/usuaris`
 | GET | `/api/usuaris/{id}` | Obtenir un usuari | 200 `UsuariResponse` |
 | PUT | `/api/usuaris/{id}` | Modificar un usuari | 200 `UsuariResponse` |
 | PUT | `/api/usuaris/{id}/password` | Canviar la contrasenya | 204 sense cos |
+| PUT | `/api/usuaris/usuari/{usuariId}/baixa` | Desactivar un usuari | 204 sense cos |
 | DELETE | `/api/usuaris/{id}` | Eliminar un usuari | 204 sense cos |
 
 ### `POST /api/usuaris/login`
@@ -168,6 +169,12 @@ Pensat per a l'administrador.
 | `actiu` | boolean | Opcional. Si es `null` no es modifica. |
 
 Errors: 400, 404 (usuari no trobat), 409 (email d'un altre usuari).
+
+### `PUT /api/usuaris/usuari/{usuariId}/baixa`
+
+No requereix cos. Posa `actiu = false` a l'usuari indicat, sense eliminar-lo
+ni modificar les seves reserves. Si ja esta desactivat, retorna igualment 204.
+Retorna 404 si l'usuari no existeix.
 
 ### `PUT /api/usuaris/{id}/password`
 
@@ -292,7 +299,7 @@ tenir una reserva per data i torn.
 | GET | `/api/reserves/cercaAdmin?reservaId=&usuariId=&pistaId=&data=&torn=` | Cerca per a l'administrador | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/disponibilitat/{pistaId}?data=` | Disponibilitat d'una pista per torns | 200 `DisponibilitatPistaResponse` |
 
-### Peticio (`POST` i `PUT`)
+### Peticio (`POST /api/reserves` i `PUT /api/reserves/{id}`)
 
 ```json
 { "usuariId": 1, "pistaId": 2, "data": "2026-10-22", "torn": 3 }
