@@ -6,8 +6,10 @@ import com.easypadel.dto.LoginResponse;
 import com.easypadel.dto.UsuariCreateRequest;
 import com.easypadel.dto.UsuariResponse;
 import com.easypadel.dto.UsuariUpdateRequest;
+import com.easypadel.entity.Rol;
 import com.easypadel.service.UsuariService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +19,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -43,7 +47,6 @@ public class UsuariController {
                                                  @Valid @RequestBody UsuariUpdateRequest request) {
         return ResponseEntity.ok(usuariService.update(id, request));
     }
-
     //DELETE /api/usuaris/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
@@ -61,6 +64,28 @@ public class UsuariController {
     @GetMapping
     public ResponseEntity<List<UsuariResponse>> listAllUsers() {
         return ResponseEntity.ok(usuariService.listAllUsers());
+    }
+
+    //GET /api/usuaris/cercaAdmin - Cerca per panell d'administrador
+    @GetMapping({"/cercaAdmin", "/cercaAdmin/"})
+    public ResponseEntity<List<UsuariResponse>> cercarAdmin(
+            @RequestParam(required = false) Integer usuariId,
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) String cognom,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String telefon,
+            @RequestParam(required = false) Rol rol,
+            @RequestParam(required = false) Boolean actiu,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataAlta) {
+        return ResponseEntity.ok(usuariService.searchForAdmin(
+                usuariId, nom, cognom, email, telefon, rol, actiu, dataAlta));
+    }
+
+    //PUT /api/usuaris/{usuariId}/baixa
+    @PutMapping("/{usuariId}/baixa")
+    public ResponseEntity<Void> baixaUsuari(@PathVariable Integer usuariId) {
+        usuariService.baixa(usuariId);
+        return ResponseEntity.noContent().build();
     }
 
     //POST /api/usuaris/login

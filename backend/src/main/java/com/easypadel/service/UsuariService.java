@@ -7,12 +7,14 @@ import com.easypadel.dto.UsuariCreateRequest;
 import com.easypadel.dto.UsuariResponse;
 import com.easypadel.dto.UsuariUpdateRequest;
 import com.easypadel.entity.Usuari;
+import com.easypadel.entity.Rol;
 import com.easypadel.exception.BackendException;
 import com.easypadel.repository.UsuariRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -69,6 +71,12 @@ public class UsuariService {
         return UsuariResponse.fromEntity(usuariobject);
     }
 
+    public void baixa(Integer id) {
+        Usuari usuari = findById(id);
+        usuari.setActiu(false);
+        usuariRepository.save(usuari);
+    }
+
     public void delete(Integer id) {
         Usuari usuari = findById(id);
         usuariRepository.delete(usuari);
@@ -93,21 +101,32 @@ public class UsuariService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<UsuariResponse> searchForAdmin(
+            Integer usuariId, String nom, String cognom, String email, String telefon,
+            Rol rol, Boolean actiu, LocalDate dataAlta) {
+        return usuariRepository.searchForAdmin(usuariId, nom, cognom, email, telefon, rol, actiu, dataAlta)
+                .stream()
+                .map(UsuariResponse::fromEntity)
+                .toList();
+    }
+
     //Metdoes propis de la autenticacio i canvi de contrasenya
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
         Usuari usuari = usuariRepository.findByEmailIgnoreCase(request.email().trim())
                 .orElseThrow(() -> new BackendException(HttpStatus.UNAUTHORIZED, "Credencials incorrectes"));
 
-        if (!usuari.isActiu()) {
-            throw new BackendException(HttpStatus.FORBIDDEN, "L'usuari està desactivat");
-        }
-
+        //De moment es compara la contrasenya en text pla, sense cap mena de seguretat
         if (!usuari.getPassword().equals(request.password())) {
             throw new BackendException(HttpStatus.UNAUTHORIZED, "Credencials incorrectes");
         }
 
-        return LoginResponse.of(UsuariResponse.fromEntity(usuari));
+        if (!usuari.isActiu()) {
+            throw new BackendException(HttpStatus.FORBIDDEN, "L'usuari està desactivat");
+        }
+
+        return LoginResponse.of(usuari);
     }
 
     public void changePassword(Integer id, CanviarPasswordRequest request) {

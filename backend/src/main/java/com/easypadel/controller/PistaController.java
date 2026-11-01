@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -57,6 +58,15 @@ public class PistaController {
     @GetMapping
     public ResponseEntity<List<PistaResponse>> listAllPistes() {
         return ResponseEntity.ok(pistaService.listAllPistes());
+    }
+
+    //GET /api/pistes/cercaAdmin - Cerca per panell d'administrador
+    @GetMapping({"/cercaAdmin", "/cercaAdmin/"})
+    public ResponseEntity<List<PistaResponse>> cercarAdmin(
+            @RequestParam(required = false) Integer pistaId,
+            @RequestParam(required = false) String nom,
+            @RequestParam(required = false) Boolean activa) {
+        return ResponseEntity.ok(pistaService.searchForAdmin(pistaId, nom, activa));
     }
 
     //GET /api/pistes/actives
