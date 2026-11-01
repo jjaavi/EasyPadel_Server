@@ -295,6 +295,7 @@ tenir una reserva per data i torn.
 | GET | `/api/reserves/usuari/{usuariId}/anteriors?data=` | Reserves d'un usuari anteriors a `data` | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/data/{data}` | Reserves d'un dia | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/properes?data=` | Properes 20 reserves des de `data` | 200 `ReservaResponse[]` |
+| GET | `/api/reserves/pista/{pistaId}` | Reserves d'una pista des d'avui (`listReservesByPista`) | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/pista/{pistaId}?data=` | Reserves d'una pista en un dia | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/cercaAdmin?reservaId=&usuariId=&pistaId=&data=&torn=` | Cerca per a l'administrador | 200 `ReservaResponse[]` |
 | GET | `/api/reserves/disponibilitat/{pistaId}?data=` | Disponibilitat d'una pista per torns | 200 `DisponibilitatPistaResponse` |
@@ -328,7 +329,8 @@ Errors:
 | `/usuari/{usuariId}/anteriors` | `data` (obligatori) | Data desc., torn desc. Exclou `data`. | 400, 404 usuari |
 | `/data/{data}` | - | Pista asc., torn asc. | 400 |
 | `/properes` | `data` (obligatori) | Data asc., torn asc., pista asc. Inclou `data`. Maxim 20. | 400 |
-| `/pista/{pistaId}` | `data` (obligatori) | Torn asc. | 400, 404 pista |
+| `/pista/{pistaId}` | Sense `data` | Data desc., torn asc. Inclou avui i futures. | 400, 404 pista |
+| `/pista/{pistaId}` | Amb `data` | Torn asc. | 400, 404 pista |
 | `/cercaAdmin` | `reservaId`, `usuariId`, `pistaId`, `data`, `torn` (tots opcionals) | - | 400 (inclou `torn` fora de 1-7), 404 usuari/pista |
 | `/disponibilitat/{pistaId}` | `data` (obligatori) | Torn asc. | 400, 403 pista desactivada, 404 pista |
 
@@ -336,6 +338,7 @@ Exemples:
 
 ```
 GET /api/reserves/usuari/1/anteriors?data=2026-10-20
+GET /api/reserves/pista/2
 GET /api/reserves/pista/2?data=2026-10-22
 GET /api/reserves/cercaAdmin?usuariId=1&data=2026-10-22
 GET /api/reserves/cercaAdmin?reservaId=10
@@ -343,6 +346,12 @@ GET /api/reserves/disponibilitat/2?data=2026-10-22
 ```
 
 Els filtres de `/cercaAdmin` es combinen amb AND. Si cap reserva coincideix, retorna una llista buida, tambe si `reservaId` no existeix.
+
+`GET /api/reserves/pista/{pistaId}` sense `data` retorna les reserves
+de la pista des de la data actual del servidor, inclosa, tambe per a pistes desactivades.
+Les reserves passades no es retornen.
+Si la pista existeix pero no te reserves des d'avui, retorna `[]`; si no existeix, retorna 404.
+Amb `data`, es conserva el filtre per dia.
 
 ### `ReservaResponse`
 

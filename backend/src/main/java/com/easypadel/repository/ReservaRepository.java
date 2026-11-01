@@ -27,6 +27,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     //Retorna la llista de reserves de un usuari ordenades per data.
     List<Reserva> findByUsuariIdOrderByDataDescTornAsc(Integer usuariId);
 
+    //Retorna les reserves d'una pista des de la data acutual
+    List<Reserva> findByPistaIdAndDataGreaterThanEqualOrderByDataDescTornAsc(Integer pistaId, LocalDate data);
+
     //Retorna la llista de reserves d'una data concreta ordenades per pista.
     List<Reserva> findByDataOrderByPistaIdAscTornAsc(LocalDate data);
 

@@ -22,7 +22,7 @@ CREATE TABLE usuaris (
     nom       VARCHAR(20)  NOT NULL,
     cognom    VARCHAR(20)  NOT NULL,
     email     VARCHAR(100) NOT NULL,
-    password  VARCHAR(20) NOT NULL,
+    password  VARCHAR(100) NOT NULL,
     telefon   VARCHAR(15)  NULL,
     rol       ENUM('ADMIN','USER') NOT NULL DEFAULT 'USER',
     actiu     BOOLEAN      NOT NULL DEFAULT TRUE,

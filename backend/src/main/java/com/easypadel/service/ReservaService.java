@@ -148,6 +148,16 @@ public class ReservaService {
     }
 
     @Transactional(readOnly = true)
+    public List<ReservaResponse> listReservesByPista(Integer pistaId) {
+        findPistaById(pistaId);
+        return reservaRepository.findByPistaIdAndDataGreaterThanEqualOrderByDataDescTornAsc(
+                        pistaId, LocalDate.now())
+                .stream()
+                .map(ReservaResponse::fromEntity)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<ReservaResponse> listReservesByPistaAndData(Integer pistaId, LocalDate data) {
         findPistaById(pistaId);
         return reservaRepository.findByPistaIdAndData(pistaId, data)

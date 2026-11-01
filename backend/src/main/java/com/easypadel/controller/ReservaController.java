@@ -97,8 +97,14 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.listReservesByData(data));
     }
 
+    //GET /api/reserves/pista/{pistaId}
+    @GetMapping(value = "/pista/{pistaId}", params = "!data")
+    public ResponseEntity<List<ReservaResponse>> listReservesByPista(@PathVariable Integer pistaId) {
+        return ResponseEntity.ok(reservaService.listReservesByPista(pistaId));
+    }
+
     //GET /api/reserves/pista/{pistaId}?data=2026-10-14
-    @GetMapping("/pista/{pistaId}")
+    @GetMapping(value = "/pista/{pistaId}", params = "data")
     public ResponseEntity<List<ReservaResponse>> listReservesByPistaAndData(
             @PathVariable Integer pistaId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
