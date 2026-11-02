@@ -6,8 +6,8 @@ l'aplicacio d'escriptori .NET.
 - URL base: `http://localhost:8080`
 - Format: JSON (`Content-Type: application/json`)
 - Dates: format ISO `yyyy-MM-dd` (p. ex. `2026-10-14`)
-- Seguretat: de moment no hi ha autenticacio als endpoints i les contrasenyes
-  es guarden i comparen en text pla.
+- Seguretat: de moment no hi ha autenticacio als endpoints. Les contrasenyes
+  es guarden com a hashes BCrypt i es verifiquen amb `PasswordEncoder.matches`.
 
 ## Index
 
@@ -64,6 +64,15 @@ de la base de dades.
 ## Usuaris
 
 Base: `/api/usuaris`
+
+El client .NET envia la contrasenya introduida (no un hash) al backend mitjancant
+HTTPS en desplegaments reals. El backend genera el hash BCrypt abans de guardar-la
+i no retorna ni la contrasenya ni el hash.
+Les contrasenyes tenen un maxim de 72 bytes en UTF-8; si una contrasenya nova
+supera aquest limit, es retorna HTTP 400. Al login es rebutja amb HTTP 401.
+Les contrasenyes antigues guardades en text pla s'han de migrar a BCrypt abans
+d'utilitzar aquest login; no hi ha comparacio alternativa en text pla ni migracio
+automatica.
 
 | Metode | Ruta | Descripcio | Resposta OK |
 |--------|------|------------|-------------|
@@ -135,7 +144,7 @@ L'app .NET ha de considerar el login correcte nomes amb un HTTP 200 i guardar
 | `nom` | string | Obligatori, max. 20. |
 | `cognom` | string | Obligatori, max. 20. |
 | `email` | string | Obligatori, format email, max. 100. Es guarda en minuscules. |
-| `password` | string | Obligatori, entre 4 i 100. |
+| `password` | string | Obligatori, entre 4 i 100 caracters i maxim 72 bytes en UTF-8. |
 | `telefon` | string | Opcional, max. 15. |
 | `rol` | string | Obligatori: `ADMIN` o `USER`. |
 
@@ -163,7 +172,7 @@ Pensat per a l'administrador.
 | `nom` | string | Obligatori, max. 20. |
 | `cognom` | string | Obligatori, max. 20. |
 | `email` | string | Obligatori, format email, max. 100. |
-| `password` | string | Opcional, entre 4 i 100. Si es buit o `null` no es modifica. |
+| `password` | string | Opcional, entre 4 i 100 caracters i maxim 72 bytes en UTF-8. Si es buit o `null` no es modifica. |
 | `telefon` | string | Opcional, max. 15. |
 | `rol` | string | Opcional: `ADMIN` o `USER`. Si es `null` no es modifica. |
 | `actiu` | boolean | Opcional. Si es `null` no es modifica. |
@@ -185,7 +194,7 @@ Retorna 404 si l'usuari no existeix.
 | Camp | Tipus | Validacio |
 |------|-------|-----------|
 | `passwordActual` | string | Obligatori. Ha de coincidir amb la contrasenya actual. |
-| `novaPassword` | string | Obligatori, entre 4 i 100. |
+| `novaPassword` | string | Obligatori, entre 4 i 100 caracters i maxim 72 bytes en UTF-8. |
 
 Errors: 400 (validacio o contrasenya actual incorrecta), 404.
 
