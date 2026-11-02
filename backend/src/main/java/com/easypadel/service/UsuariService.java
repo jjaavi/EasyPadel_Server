@@ -11,9 +11,11 @@ import com.easypadel.entity.Rol;
 import com.easypadel.exception.BackendException;
 import com.easypadel.repository.UsuariRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,9 +24,11 @@ import java.util.List;
 public class UsuariService {
 
     private final UsuariRepository usuariRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuariService(UsuariRepository usuariRepository) {
+    public UsuariService(UsuariRepository usuariRepository, PasswordEncoder passwordEncoder) {
         this.usuariRepository = usuariRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UsuariResponse create(UsuariCreateRequest request) {
@@ -36,7 +40,7 @@ public class UsuariService {
         nouUsuari.setNom(request.nom());
         nouUsuari.setCognom(request.cognom());
         nouUsuari.setEmail(request.email().toLowerCase().trim());
-        nouUsuari.setPassword(request.password());
+        nouUsuari.setPassword(encodePassword(request.password()));
         nouUsuari.setTelefon(request.telefon());
         nouUsuari.setRol(request.rol());
         nouUsuari.setActiu(true);
@@ -58,7 +62,7 @@ public class UsuariService {
         usuari.setTelefon(request.telefon());
 
         if (request.password() != null && !request.password().isBlank()) {
-            usuari.setPassword(request.password());
+            usuari.setPassword(encodePassword(request.password()));
         }
         if (request.rol() != null) {
             usuari.setRol(request.rol());
@@ -117,8 +121,7 @@ public class UsuariService {
         Usuari usuari = usuariRepository.findByEmailIgnoreCase(request.email().trim())
                 .orElseThrow(() -> new BackendException(HttpStatus.UNAUTHORIZED, "Credencials incorrectes"));
 
-        //De moment es compara la contrasenya en text pla, sense cap mena de seguretat
-        if (!usuari.getPassword().equals(request.password())) {
+        if (!matchesPassword(request.password(), usuari.getPassword())) {
             throw new BackendException(HttpStatus.UNAUTHORIZED, "Credencials incorrectes");
         }
 
@@ -132,11 +135,25 @@ public class UsuariService {
     public void changePassword(Integer id, CanviarPasswordRequest request) {
         Usuari usuari = findById(id);
 
-        if (!usuari.getPassword().equals(request.passwordActual())) {
+        if (!matchesPassword(request.passwordActual(), usuari.getPassword())) {
             throw new BackendException(HttpStatus.BAD_REQUEST, "La contrasenya actual no és correcta");
         }
 
-        usuari.setPassword(request.novaPassword());
+        usuari.setPassword(encodePassword(request.novaPassword()));
         usuariRepository.save(usuari);
+    }
+
+    //Codifica el password per poder guardar el hashs
+    private String encodePassword(String password) {
+        if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new BackendException(HttpStatus.BAD_REQUEST, "La contrasenya no pot superar els 72 bytes en UTF-8");
+        }
+        return passwordEncoder.encode(password);
+    }
+
+    //Comprova els hashs de la contrasenya que es passa
+    private boolean matchesPassword(String password, String hash) {
+        return password.getBytes(StandardCharsets.UTF_8).length <= 72
+                && passwordEncoder.matches(password, hash);
     }
 }
